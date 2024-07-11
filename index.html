@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+</head>
+<body>
+    <form action="/create-checkout-session" method="POST">
+        <button type="submit">Checkout</button>
+    </form>
+
+    <script type="text/javascript">
+        const stripe = Stripe('your-publishable-key-here');
+
+        document.querySelector("form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const response = await fetch("/create-checkout-session", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    item_name: "Test Item",
+                    amount: 5000, // amount in cents
+                    success_url: "https://your-domain.com/success",
+                    cancel_url: "https://your-domain.com/cancel"
+                })
+            });
+
+            const session = await response.json();
+            await stripe.redirectToCheckout({ sessionId: session.id });
+        });
+    </script>
+</body>
+</html>
+
